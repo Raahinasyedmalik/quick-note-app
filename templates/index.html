@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Note Application</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; }
+        textarea { width: 100%; height: 100px; margin-bottom: 10px; }
+        button { padding: 10px 20px; background-color: #007bff; color: white; border: none; cursor: pointer; }
+        ul { list-style-type: none; padding: 0; }
+        li { background: #f4f4f4; margin: 8px 0; padding: 10px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h2>Quick Note Application</h2>
+    <textarea id="noteInput" placeholder="Type your note here..."></textarea><br>
+    <button onclick="saveNote()">Save Note</button>
+
+    <h3>Your Saved Notes</h3>
+    <ul id="notesList"></ul>
+
+    <script>
+        async function fetchNotes() {
+            const res = await fetch('/notes');
+            const notes = await res.json();
+            const list = document.getElementById('notesList');
+            list.innerHTML = '';
+            notes.forEach(note => {
+                const li = document.createElement('li');
+                li.textContent = note;
+                list.appendChild(li);
+            });
+        }
+
+        async function saveNote() {
+            const content = document.getElementById('noteInput').value;
+            if(!content) return alert("Write something first!");
+            
+            await fetch('/notes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content })
+            });
+
+            document.getElementById('noteInput').value = '';
+            fetchNotes();
+        }
+
+        fetchNotes();
+    </script>
+</body>
+</html>
